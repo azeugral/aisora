@@ -44,23 +44,20 @@ const revela=els=>els.forEach(e=>rio.observe(e));
 revela($$(".rv,.sp2"));
 if(HV&&!RM)$$("[data-mag]").forEach(a=>{a.style.transition="transform .4s var(--eo)";a.addEventListener("pointermove",e=>{const r=a.getBoundingClientRect();a.style.transform="translate("+((e.clientX-r.left-r.width/2)*.12).toFixed(1)+"px,"+((e.clientY-r.top-r.height/2)*.2).toFixed(1)+"px)"});a.addEventListener("pointerleave",()=>{a.style.transform=""})});
 
-/* ===== 01 ORÇAMENTO: LRGZ Manequim no modo vitrine ===== */
-const MQ="https://lrgz-manequim.pages.dev/aisora/",fr=$("#manequim"),hd=$("#hd");
-addEventListener("message",e=>{if(e.source!==fr.contentWindow||!e.data||!e.data.manequim)return;const d=e.data;
-if(d.altura)fr.style.height=Math.max(480,Math.min(4000,d.altura))+"px";
-if(d.rolar){const base=fr.getBoundingClientRect().top+scrollY,t=base+d.rolar.t,b=base+d.rolar.b,livre=hd.getBoundingClientRect().bottom+14,cima=scrollY+livre,baixo=scrollY+innerHeight-16;let y=null;
-if(d.rolar.modo==="fim"){if(b>baixo)y=b-innerHeight+24}else if(t<cima||b>baixo)y=t-livre;
-if(y!==null)scrollTo({top:Math.max(0,y),behavior:RM?"auto":"smooth"})}});
-const esc0={};const wfIO=new IntersectionObserver(es=>{es.forEach(e=>esc0[e.target.tagName]=e.isIntersecting);WF.classList.toggle("fora",Object.values(esc0).some(Boolean))},{rootMargin:"-15% 0px -15% 0px"});wfIO.observe(fr);
-new IntersectionObserver(([e])=>{esc0.FOOTER=e.isIntersecting;WF.classList.toggle("fora",Object.values(esc0).some(Boolean))},{rootMargin:"0px 0px 40px 0px"}).observe($(".fin"));
-function orcamento(estilo,desenho){const q=new URLSearchParams({vitrine:"1"});if(estilo)q.set("estilo",estilo);if(desenho)q.set("desenho",desenho);fr.src=MQ+"?"+q.toString();$("#projeto").scrollIntoView({behavior:RM?"auto":"smooth"})}
+/* ===== 01 ORÇAMENTO: configurador original (js/orcamento.js) ===== */
+const fr=$("#pb");
+/* WhatsApp fixo some sobre o orçamento e no fim da página */
+const esc0={};const wfV=(k,v)=>{esc0[k]=v;WF.classList.toggle("fora",Object.values(esc0).some(Boolean))};
+new IntersectionObserver(([e])=>wfV("orc",e.isIntersecting),{rootMargin:"-15% 0px -15% 0px"}).observe(fr);
+new IntersectionObserver(([e])=>wfV("fim",e.isIntersecting),{rootMargin:"0px 0px 40px 0px"}).observe($(".fin"));
+function orcamento(estilo,desenho){if(desenho&&window.orcArte){const a=(window.ARTES||[]).find(x=>x.nome===desenho);if(a){window.orcArte(a.id);return}}if(window.orcEstilo)window.orcEstilo(estilo)}
 
 /* ===== 02 TRABALHOS: filtros por estilo, grade, "ver mais" ===== */
 const OB=(window.OBRAS||[]).slice().sort((a,b)=>a.id.localeCompare(b.id)),TEMAS=["Blackwork","Geek / Anime","Oriental"],PF=$("#pf"),FT=$("#ft"),MAIS=$("#mais"),PASSO=innerWidth<860?12:16;
 let tema="all",qtd=PASSO;
 const lista=()=>tema==="all"?OB:OB.filter(o=>o.tema===tema);
 const num=(o)=>"N° "+o.id;
-function tile(o,i,re){return'<li class="'+(re?"re":"")+'" style="--d:'+(i%8)+'"><button type="button" class="ob" data-id="'+o.id+'" aria-label="'+ESC(o.titulo)+", "+ESC(o.tema)+'. Ampliar"><span class="of"><img src="img/t/'+o.id+'.webp" width="720" height="900" alt="Tatuagem: '+ESC(o.titulo)+'" decoding="async" draggable="false"><span class="av mi" aria-hidden="true">AMPLIAR +</span></span><span class="oc"><b>'+ESC(o.titulo)+'</b><span class="mi">'+ESC(o.tema)+"</span></span></button></li>"}
+function tile(o,i,re){return'<li class="'+(re?"re":"")+'" style="--d:'+(i%8)+'"><button type="button" class="ob" data-id="'+o.id+'" aria-label="Tatuagem '+o.id+', '+ESC(o.tema)+'. Ampliar"><span class="of"><img src="img/t/'+o.id+'.webp" width="720" height="900" alt="Tatuagem da Aisora em '+ESC(o.tema)+'" decoding="async" draggable="false"><span class="av mi" aria-hidden="true">AMPLIAR +</span></span><span class="oc"><span class="mi">'+ESC(o.tema)+"</span></span></button></li>"}
 function pinta(anima){const L=lista(),n=Math.min(qtd,L.length);PF.innerHTML=L.slice(0,n).map((o,i)=>tile(o,i,anima)).join("");
 MAIS.hidden=n>=L.length;MAIS.querySelector("span").textContent="Ver mais trabalhos ("+(L.length-n)+")";
 $("#gct").textContent=String(L.length).padStart(2,"0")+" TRABALHOS"}
@@ -86,9 +83,9 @@ GAL.addEventListener("click",e=>{const b=e.target.closest(".art");if(b)abre("art
 const AM=$("#am"),AI=$("#am-img"),AF=$(".am-f"),AV=$("#am-vs");let modo="",lst=[],pos=0,quem=null;
 function mostra(){const o=lst[pos];AF.classList.remove("sw2");void AF.offsetWidth;AF.classList.add("sw2");
 if(modo==="obra"){const vs=[{src:"img/g/"+o.id+".webp",legenda:"Tatuagem"}].concat(o.extras||[]);
-AI.src=vs[0].src;AI.alt="Tatuagem: "+o.titulo;AV.hidden=vs.length<2;
+AI.src=vs[0].src;AI.alt="Tatuagem da Aisora em "+o.tema;AV.hidden=vs.length<2;
 AV.innerHTML=vs.length<2?"":vs.map((v,i)=>'<button type="button" class="'+(i?"":"on")+'" data-src="'+v.src+'" aria-pressed="'+!i+'">'+ESC(i?v.legenda:"A tatuagem")+"</button>").join("");
-$("#am-id").textContent=num(o)+" — "+o.tema.toUpperCase();$("#am-t").textContent=o.titulo;
+$("#am-id").textContent=num(o);$("#am-t").textContent=o.tema;
 $("#am-ds").textContent=o.extras?"Desenhada pela Aisora para este projeto e levada à pele em preto e cinza.":"Do arquivo da Aisora. Use como ponto de partida: no orçamento você conta o que quer mudar.";
 $("#am-dl").innerHTML="<div><dt class=\"mi\">ESTILO</dt><dd>"+ESC(o.tema)+"</dd></div>";
 $("#am-go").innerHTML="QUERO UMA ASSIM <em>→</em>"}

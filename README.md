@@ -5,7 +5,7 @@ Site da Aisora (@aisora.ink), tatuadora de Blackwork, geek/anime e oriental no I
 - **01 Orçamento:** LRGZ Manequim em modo vitrine (Local · Projeto · Enviar, direto no WhatsApp, sem Google Agenda): https://lrgz-manequim.pages.dev/aisora/ (cliente `clientes/aisora.json` no repo lrgz-manequim).
 - **02 Trabalhos:** 73 peças do Instagram em 3 estilos (Blackwork, Geek / Anime, Oriental), com filtro, "ver mais" e visualizador (setas, arrasto, "Quero uma assim" abre o orçamento já com o estilo). Três peças usam as fotos originais em alta; a Lua vermelha mostra também o desenho no iPad.
 - **03 Disponíveis:** Retratos I e Athena, com "Quero tatuar essa arte".
-- **04 Contato:** endereço, Instagram, WhatsApp e mapa.
+- **04 Contato:** endereço, Instagram, WhatsApp e mapa do Google de verdade (ampliar, como chegar, abrir no app).
 
 Imagens geradas por `tools/prep.py`, logo por `tools/logo.py`, página por `tools/monta.py` (pasta do projeto, fora do repo). `noindex` enquanto não for aprovado.
 
@@ -15,6 +15,8 @@ Imagens geradas por `tools/prep.py`, logo por `tools/logo.py`, página por `tool
 - Os cartões das artes não ficam mais invisíveis: antes, a animação de entrada era ligada depois que o observador já tinha rodado.
 - As imagens não usam mais carregamento preguiçoso (lazy).
 - O código e o CSS que não eram mais usados saíram.
+- Fumaça de volta: o fundo do body cobria o canvas (agora igual ao original, com mistura screen).
+- Cabeçalho ganha fundo sólido fora da abertura (não passa mais por cima dos textos); WhatsApp fixo some no fim da página.
 - O arquivo com tudo embutido (3 MB) virou arquivos separados.
 
 ## CONFIRMAR com a Aisora

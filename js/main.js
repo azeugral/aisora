@@ -36,7 +36,7 @@ addEventListener("keydown",e=>{if(e.key==="Escape"&&menu.classList.contains("o")
 const secs=["hero","projeto","trabalhos","catalogo","contato"].map(i=>$("#"+i)),rl=$$("#rail a");
 function railUpdate(){const m=innerHeight*.45;let k=0;secs.forEach((s,i)=>{const r=s.getBoundingClientRect();if(r.top<=m&&r.bottom>m)k=i});rl.forEach((a,i)=>{const on=i===k;a.classList.toggle("on",on);if(on)a.setAttribute("aria-current","true");else a.removeAttribute("aria-current")})}
 const root=document.documentElement;let ticking=0;
-function onScroll(){ticking=0;railUpdate();const h=root.scrollHeight-innerHeight;root.style.setProperty("--sp",(h>0?scrollY/h:0).toFixed(4))}
+const HD=$("#hd");function onScroll(){ticking=0;railUpdate();HD.classList.toggle("sol",scrollY>innerHeight*.85);const h=root.scrollHeight-innerHeight;root.style.setProperty("--sp",(h>0?scrollY/h:0).toFixed(4))}
 addEventListener("scroll",()=>{if(!ticking){ticking=1;requestAnimationFrame(onScroll)}},{passive:true});addEventListener("resize",onScroll);addEventListener("load",onScroll);onScroll();
 /* revelações: um observador só, que também recebe o que entra depois (cartões, grade) */
 const rio=new IntersectionObserver(es=>es.forEach(x=>{if(x.isIntersecting){x.target.classList.add("in");rio.unobserve(x.target)}}),{threshold:.12,rootMargin:"0px 0px -6% 0px"});
@@ -51,7 +51,8 @@ if(d.altura)fr.style.height=Math.max(480,Math.min(4000,d.altura))+"px";
 if(d.rolar){const base=fr.getBoundingClientRect().top+scrollY,t=base+d.rolar.t,b=base+d.rolar.b,livre=hd.getBoundingClientRect().bottom+14,cima=scrollY+livre,baixo=scrollY+innerHeight-16;let y=null;
 if(d.rolar.modo==="fim"){if(b>baixo)y=b-innerHeight+24}else if(t<cima||b>baixo)y=t-livre;
 if(y!==null)scrollTo({top:Math.max(0,y),behavior:RM?"auto":"smooth"})}});
-new IntersectionObserver(([e])=>WF.classList.toggle("fora",e.isIntersecting),{rootMargin:"-15% 0px -15% 0px"}).observe(fr);
+const esc0={};const wfIO=new IntersectionObserver(es=>{es.forEach(e=>esc0[e.target.tagName]=e.isIntersecting);WF.classList.toggle("fora",Object.values(esc0).some(Boolean))},{rootMargin:"-15% 0px -15% 0px"});wfIO.observe(fr);
+new IntersectionObserver(([e])=>{esc0.FOOTER=e.isIntersecting;WF.classList.toggle("fora",Object.values(esc0).some(Boolean))},{rootMargin:"0px 0px 40px 0px"}).observe($(".fin"));
 function orcamento(estilo,desenho){const q=new URLSearchParams({vitrine:"1"});if(estilo)q.set("estilo",estilo);if(desenho)q.set("desenho",desenho);fr.src=MQ+"?"+q.toString();$("#projeto").scrollIntoView({behavior:RM?"auto":"smooth"})}
 
 /* ===== 02 TRABALHOS: filtros por estilo, grade, "ver mais" ===== */
@@ -107,16 +108,10 @@ let sx=0,sy=0;AF.addEventListener("touchstart",e=>{sx=e.touches[0].clientX;sy=e.
 AF.addEventListener("touchend",e=>{const dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)*1.3)anda(dx<0?1:-1)},{passive:true});
 $("#am-go").onclick=()=>{const o=lst[pos];fecha();if(modo==="obra")orcamento(o.tema);else orcamento("Arte disponível",o.nome)};
 
-/* mapa do contato */
-(function(){const c=$("#xmc"),h=$("#xmh");if(!c)return;
-const fine=matchMedia("(hover:hover) and (pointer:fine)"),rm=matchMedia("(prefers-reduced-motion:reduce)");
-const set=v=>{c.setAttribute("aria-expanded",v);h.textContent=v?"CLIQUE PARA FECHAR":"CLIQUE PARA EXPANDIR"};
-c.addEventListener("click",()=>set(c.getAttribute("aria-expanded")!=="true"));c.addEventListener("keydown",e=>{if(e.key==="Escape")set(false)});
-let rx=0,ry=0,tx=0,ty=0,raf=0;
-function tick(){rx+=(tx-rx)*.16;ry+=(ty-ry)*.16;const done=Math.abs(tx-rx)<.02&&Math.abs(ty-ry)<.02&&!tx&&!ty;c.style.transform=done?"":"perspective(1000px) rotateX("+rx.toFixed(2)+"deg) rotateY("+ry.toFixed(2)+"deg)";raf=done?0:requestAnimationFrame(tick)}
-const go=()=>{if(!raf)raf=requestAnimationFrame(tick)};
-c.addEventListener("pointermove",e=>{if(!fine.matches||rm.matches)return;const r=c.getBoundingClientRect(),nx=Math.max(-1,Math.min(1,(e.clientX-r.left-r.width/2)/(r.width/2))),ny=Math.max(-1,Math.min(1,(e.clientY-r.top-r.height/2)/(r.height/2)));ty=nx*5;tx=-ny*5;go()});
-c.addEventListener("pointerleave",()=>{tx=ty=0;go()})})();
+/* mapa do contato: Google Maps de verdade; o botão amplia o quadro */
+(function(){const c=$("#xmc"),b=$("#xmb");if(!c||!b)return;
+b.addEventListener("click",()=>{const o=!c.classList.contains("o");c.classList.toggle("o",o);b.setAttribute("aria-expanded",o);b.textContent=o?"Reduzir o mapa":"Ampliar o mapa"})})();
+
 /* ===== abertura: a logo vem em direção à câmera, fica vazada e engole a tela (uma vez por sessão) ===== */
 (function(){const R=document.documentElement;if(!R.classList.contains("intro")){const w=$("#intro");if(w)w.remove();return}
 try{sessionStorage.setItem("aisoraIntro","1")}catch(e){}
